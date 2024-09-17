@@ -1,0 +1,55 @@
+!!! Development only setups !!!
+
+[ step1: based on localhost ]
+
+MongoDB
+  docker run --name mongodb --rm -d -p 27017:27017 mongo
+
+backend
+  docker run --name goals-backend --rm -d -p 80:80 goals-node
+
+frontend
+  docker run --name goals-frontend --rm -d -p 3000:3000 -it goals-react
+  * --it is specifically for react app
+
+-----------------------------------------------------------------------
+[ step2: utilizing created network ]
+
+docker network ls
+
+docker network create goals-network
+
+MongoDB
+  docker run --name mongodb --rm -d --network goals-network mongo
+
+backend
+  docker run --name goals-backend --rm -d -p 80:80 --network goals-network goals-node
+  * -p 80:80 is for react app to talk to backend. still needed
+
+frontend
+  docker run --name goals-frontend --rm -d -p 3000:3000 -it goals-react
+  * it's because react doesn't run in the server but on browsers. doesn't matter the network
+
+-----------------------------------------------------------------------
+[ step3: utilizing created network and volumes ]
+
+docker network ls
+
+docker network create goals-network
+
+MongoDB
+  docker run --name mongodb -v data:/data/db --rm -d --network goals-network -e MONGO_INITDB_ROOT_USERNAME=name -e MONGO_INITDB_ROOT_PASSWORD=password mongo
+
+backend
+  docker run --name goals-backend -v [..(path)../multi-container-app/backend]:/app -v logs:/app/logs -v /app/node_modules --rm -d -p 80:80 --network goals-network goals-node
+  * longer overwrites shorter
+
+frontend
+  docker run -v /Users/User/VScode/multi-container-app/frontend/src:/app/src --name goals-frontend --rm -d -p 3000:3000 -it goals-react
+  * binding local source folder to container source folder
+
+-----------------------------------------------------------------------
+[ other note ]
+instead of dockerizing a database, use a managed database service
+for scaling, performance, and backup concern
+e.g. AWS RDS, MongoDB Altas
