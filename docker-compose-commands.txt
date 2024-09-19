@@ -1,0 +1,14 @@
+start
+  docker-compose up -d
+
+delete
+  docker-compose down
+
+delete with volume
+  docker-compose down -v
+
+only build
+  docker-compose build
+
+
+* docker compose creates a default network, so no need to specify on it

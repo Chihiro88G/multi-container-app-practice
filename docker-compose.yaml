@@ -1,0 +1,53 @@
+version: '3.8'
+services: 
+  mongodb:
+    image: 'mongo'
+    volumes:
+      - data:/data/db
+
+    # optional. otherwise auto generated name will be assigned to container
+    # container_name: mongodb
+    
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME:name
+    #   MONGO_INITDB_ROOT_PASSWORD:password
+    env_file:
+      - ./env/mongo.env
+
+  backend:
+    build: './backend'  # build image instead of specifying one image here
+
+    # in case name of dockerfile is different from default and/or not under the main directory
+    # build:
+    #   context: './backend'
+    #   dockerfile: Dockerfile
+    #   args:
+    #     some-arg: 1
+
+    ports:    
+      - '80:80'
+    volumes:
+      - logs:/app/logs
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./env/backend.env
+    depends_on:
+      - mongodb
+
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend/src:/app/src
+    
+    # -it consists of the 2 items below
+    stdin_open: true    
+    tty: true
+    depends_on:
+      - backend
+
+volumes:
+  data:
+  logs:
