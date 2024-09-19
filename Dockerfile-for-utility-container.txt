@@ -1,0 +1,23 @@
+FROM node:14-alpine   * alpine is smaller
+
+WORKDIR /app
+
+ENTRYPOINT [ 'npm' ]  * e.g. to run npm install, just add 'install' to the command
+
+
+
+[default command version]
+docker run -it -v [path]:/app [image name] 
+=> or using docker-compose
+
+[docker-compose version]
+version: 3.8
+services: 
+  npm(*):
+    build: ./
+    stdin_open: true    
+    tty: true
+    volumes: 
+      - ./:/app
+
+* docker-compose run --rm npm(*) init
